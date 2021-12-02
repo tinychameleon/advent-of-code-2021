@@ -17,8 +17,14 @@
   [s]
   (Integer/parseInt s))
 
-(defn adjacent-tuples
-  "Return a seq of adjacent tuples of size n from coll."
+(defn read-ints
+  "Read lines of integers from filename."
+  [filename]
+  (map str->int (read-lines filename)))
+
+(defn- adjacent-tuples
+  "Return a seq of adjacent tuples of size n from coll.
+  Made private from learning about clojure.core/partition."
   ([coll]
    (adjacent-tuples 2 coll))
   ([n coll]
