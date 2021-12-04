@@ -12,10 +12,15 @@
   [filename]
   (str/split-lines (read-file filename)))
 
-(defn str-split
+(defn str-split-chars
   "Split a string into string representations of each character."
   [s]
   (str/split s #""))
+
+(defn str-split
+  "Split a string with the string as the last parameter."
+  [re s]
+  (str/split s re))
 
 (defn str->int
   "Convert a string to an integer."
@@ -28,6 +33,23 @@
   "Read lines of integers from filename."
   [filename]
   (map str->int (read-lines filename)))
+
+(defn floor
+  "Round any non-integer down to the nearest integer."
+  [n]
+  (-> n Math/floor int))
+
+(defn zip
+  "Zip colls together."
+  [& colls]
+  (apply map vector colls))
+
+(defn with-index
+  "Create a new seq of [index val] pairs from coll."
+  ([coll]
+   (with-index coll 0))
+  ([coll start]
+   (zip (drop start (range)) coll)))
 
 (defn- adjacent-tuples
   "Return a seq of adjacent tuples of size n from coll.

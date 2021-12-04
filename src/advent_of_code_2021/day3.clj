@@ -8,7 +8,7 @@
 
 (defn binary->vec
   [binary-string]
-  (into [] (map core/str->int (core/str-split binary-string))))
+  (into [] (map core/str->int (core/str-split-chars binary-string))))
 
 (defn read-report-into-vec
   [filename]
