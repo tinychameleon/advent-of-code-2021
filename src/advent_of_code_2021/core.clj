@@ -10,12 +10,19 @@
 (defn read-lines
   "Read all the lines in filename."
   [filename]
-  (str/split (read-file filename) #"\n"))
+  (str/split-lines (read-file filename)))
+
+(defn str-split
+  "Split a string into string representations of each character."
+  [s]
+  (str/split s #""))
 
 (defn str->int
   "Convert a string to an integer."
-  [s]
-  (Integer/parseInt s))
+  ([s]
+   (str->int 10 s))
+  ([base s]
+   (Integer/parseInt s base)))
 
 (defn read-ints
   "Read lines of integers from filename."
