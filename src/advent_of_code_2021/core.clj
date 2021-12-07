@@ -39,6 +39,11 @@
   [n]
   (-> n Math/floor int))
 
+(defn ceiling
+  "Round any non-integer up to the nearest integer."
+  [n]
+  (-> n Math/ceil int))
+
 (defn zip
   "Zip colls together."
   [& colls]
