@@ -56,6 +56,11 @@
   ([coll start]
    (zip (drop start (range)) coll)))
 
+(defn value-counts
+  [coll]
+  (->> (group-by identity coll)
+       (reduce (fn [m [k v]] (assoc m k (count v))) {})))
+
 (defn- adjacent-tuples
   "Return a seq of adjacent tuples of size n from coll.
   Made private from learning about clojure.core/partition."

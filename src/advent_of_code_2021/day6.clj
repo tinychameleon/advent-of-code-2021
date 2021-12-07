@@ -12,9 +12,7 @@
        str/trim
        (core/str-split #",")
        (mapv core/str->int)
-       (group-by identity)
-       (map (fn [[k v]] [k (count v)]))
-       (into {})))
+       core/value-counts))
 
 (defn simulate-age
   [age]
