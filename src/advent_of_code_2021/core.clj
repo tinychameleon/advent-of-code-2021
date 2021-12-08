@@ -17,6 +17,11 @@
   [s]
   (str/split s #""))
 
+(defn str-split-words
+  "Split a string into words based on space characters."
+  [s]
+  (str/split s #"\s+"))
+
 (defn str-split
   "Split a string with the string as the last parameter."
   [re s]
