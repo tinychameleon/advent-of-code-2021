@@ -54,19 +54,14 @@
   #(->> (:diff-by rule) known (apply disj %) count (= (:diff-eq rule))))
 
 (defn process-signals
-  [rules signals]
-  (let [[a b] (signal-state signals)]
-    (loop [known a
-           unknown b
-           [rule & rest] rules]
-      (if rule
-        (let [pred (every-pred (length-of rule) (diff-by known rule))
-              match (first (filter pred unknown))]
-          (recur (assoc known (:number rule) match) (remove #(= % match) unknown) rest))
-        (reduce-kv (fn [m val digit]
-                     (assoc m (apply str digit) val))
-                   {}
-                   known)))))
+  ([rules signals]
+   (apply process-signals rules (signal-state signals)))
+  ([[rule & rules] known unknown]
+   (if rule
+     (let [pred (every-pred (length-of rule) (diff-by known rule))
+           match (first (filter pred unknown))]
+       (recur rules (assoc known (:number rule) match) (remove #(= % match) unknown)))
+     (reduce-kv #(assoc %1 (apply str %3) %2) {} known))))
 
 (defn seq->int
   [s]
