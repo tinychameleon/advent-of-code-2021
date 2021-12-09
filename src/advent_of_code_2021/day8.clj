@@ -61,12 +61,12 @@
            [rule & rest] rules]
       (if rule
         (let [pred (every-pred (length-of rule) (diff-by known rule))
-              match (->> unknown (filter pred) first)]
+              match (first (filter pred unknown))]
           (recur (assoc known (:number rule) match) (remove #(= % match) unknown) rest))
-        (reduce (fn [m [val digit]]
-                  (assoc m (apply str digit) val))
-                {}
-                known)))))
+        (reduce-kv (fn [m val digit]
+                     (assoc m (apply str digit) val))
+                   {}
+                   known)))))
 
 (defn seq->int
   [s]
