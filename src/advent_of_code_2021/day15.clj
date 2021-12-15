@@ -3,17 +3,20 @@
 
 (def char->int (comp core/str->int str))
 
+(defn cons-state
+  [graph]
+  {:graph graph :rows (count graph) :columns (count (get graph 0))})
+
 (defn parse-risk-level-graph
   [filename]
-  (let [graph (mapv #(mapv char->int %) (core/read-lines filename))]
-    {:graph graph :rows (count graph) :columns (count (get graph 0))}))
+  (->> filename core/read-lines (mapv #(mapv char->int %)) cons-state))
 
 (defn vertices
   [{:keys [rows columns]}]
   (for [y (range rows) x (range columns)]
     [y x]))
 
-(defn neighbours
+(defn vertex-neighbours
   [{:keys [rows columns]} [y x]]
   (for [[dy dx] [[-1 0] [1 0] [0 -1] [0 1]]
         :let [r (+ y dy) c (+ x dx)]
@@ -28,28 +31,24 @@
       (-> state
           (update :work disj [recorded-cost v])
           (update :work conj [cost v])
-          (assoc-in [:costs v] cost)
-          (assoc-in [:paths v] vertex))
+          (assoc-in [:costs v] cost))
       state)))
 
-(defn update-costs
+(defn update-state
   [graph entry state vertices]
   (let [f (partial update-vertex (graph :graph) entry)]
     (reduce f state vertices)))
 
 (defn dijkstra
-  ([graph target start]
-   (let [state {:costs {start 0} :paths {start nil} :work (sorted-set [0 start])}]
-     (dijkstra graph target #{} state)))
-  ([graph target visited state]
-   (let [[cost vertex :as entry] (first (state :work))
-         state (update state :work disj entry)]
-     (cond
-       (nil? cost) state
-       (= vertex target) state
-       :else (let [next-vertices (remove visited (neighbours graph vertex))
-                   state (update-costs graph entry state next-vertices)]
-               (recur graph target (conj visited vertex) state))))))
+  [graph target start]
+  (loop [state {:costs {start 0} :work (sorted-set [0 start])}
+         visited #{}]
+    (let [[cost vertex :as entry] (first (state :work))
+          state (update state :work disj entry)
+          neighbours (remove visited (vertex-neighbours graph vertex))]
+      (if (or (nil? cost) (= vertex target))
+        state
+        (recur (update-state graph entry state neighbours) (conj visited vertex))))))
 
 (defn wrap+
   [n x]
@@ -63,14 +62,11 @@
 (defn extend-graph
   [n graph]
   (let [fns (wrap-fns n)
-        columns (map (fn [row] (flatten (map #(mapv % row) fns))) (graph :graph))
-        rows (reduce #(apply conj %1 %2)
-                     []
-                     (map (fn [f] (map #(mapv f %) columns)) fns))]
-    (-> graph
-        (assoc :graph rows)
-        (assoc :rows (count rows))
-        (assoc :columns (count (get rows 0))))))
+        extend-columns (fn [row] (flatten (map #(mapv % row) fns)))
+        columns (map extend-columns (graph :graph))
+        extended-rows (map (fn [f] (map #(mapv f %) columns)) fns)
+        rows (reduce #(apply conj %1 %2) [] extended-rows)]
+    (cons-state rows)))
 
 (defn search
   [graph-mutator]
