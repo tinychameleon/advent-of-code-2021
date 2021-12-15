@@ -31,8 +31,7 @@
       (-> state
           (update :work disj [recorded-cost v])
           (update :work conj [cost v])
-          (assoc-in [:costs v] cost)
-          (assoc-in [:paths v] vertex))
+          (assoc-in [:costs v] cost))
       state)))
 
 (defn update-state
@@ -42,7 +41,7 @@
 
 (defn dijkstra
   [graph target start]
-  (loop [state {:costs {start 0} :paths {start nil} :work (sorted-set [0 start])}
+  (loop [state {:costs {start 0} :work (sorted-set [0 start])}
          visited #{}]
     (let [[cost vertex :as entry] (first (state :work))
           state (update state :work disj entry)
